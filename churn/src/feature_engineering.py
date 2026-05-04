@@ -12,14 +12,16 @@ df=load_data()
 # data[col_null]=data[col_null].fillna(data[col_null].median())
 # data=data[(data['HourSpendOnApp'])!=0]
 def feature_engineering(df):
-    # Create new features
-    df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
-    df["TenureMonths"] = df["Tenure"]
-    df["MonthlyChargesPerService"] = df["MonthlyCharges"] / (df["tenure"] + 1)
-
-    # Drop original columns if needed
-    # df.drop(columns=["tenure"], inplace=True)
-
+    df['AvgOrderValue'] = df['CashbackAmount'] / (df['OrderCount'] + 1)
+    df['EngagementScore'] = df['HourSpendOnApp'] * df['OrderCount']
+    df['RecencyScore'] = 1 / (df['DaySinceLastOrder'] + 1)
     return df
+    # # Create new features
+    # df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
+    # df["TenureMonths"] = df["Tenure"]
+    # df["MonthlyChargesPerService"] = df["MonthlyCharges"] / (df["tenure"] + 1)
 
-df= feature_engineering(df)
+    # # Drop original columns if needed
+    # # df.drop(columns=["tenure"], inplace=True)
+
+

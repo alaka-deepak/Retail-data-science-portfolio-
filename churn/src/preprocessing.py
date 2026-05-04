@@ -2,37 +2,44 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import LabelEncoder
 
 
-def get_preprocessor():
+def preprocess_data(df):
+    df=df.drop("CustomerID",axis=1)
+    # Fill missing values
 
-    num_cols = [
-        "Tenure", "WarehouseToHome", "HourSpendOnApp",
-        "OrderAmountHikeFromlastYear", "CouponUsed",
-        "OrderCount", "DaySinceLastOrder", "CashbackAmount"
+    col_null=[
+        'DaySinceLastOrder',
+        'OrderAmountHikeFromlastYear',
+        'Tenure',
+        'OrderCount',
+        'CouponUsed',
+        'WarehouseToHome'
+
     ]
-
+    
+    df[col_null]=df[col_null].fillna(df[col_null].median())
+# Handle categorical nulls
     cat_cols = [
-        "PreferredLoginDevice", "PreferredPaymentMode",
-        "Gender", "PreferedOrderCat", "MaritalStatus"
+        'PreferredPaymentMode',
+        'PreferedOrderCat',
+        'PreferredLoginDevice',
+        'MaritalStatus',
+        'Gender'
     ]
 
-    # Numerical pipeline
-    numeric_pipeline = Pipeline([
-        ("imputer", SimpleImputer(strategy="median")),
-        ("scaler", StandardScaler())
-    ])
+    for col in cat_cols:
+        df[col] = df[col].fillna(df[col].mode()[0])
 
-    # Categorical pipeline
-    categorical_pipeline = Pipeline([
-        ("imputer", SimpleImputer(strategy="most_frequent")),
-        ("encoder", OneHotEncoder(handle_unknown="ignore"))
-    ])
+    # 🔥 encode categorical
+    le = LabelEncoder()
+    for col in cat_cols:
+        df[col] = le.fit_transform(df[col])
 
-    # Combine
-    preprocessor = ColumnTransformer([
-        ("num", numeric_pipeline, num_cols),
-        ("cat", categorical_pipeline, cat_cols)
-    ])
+    # Remove invalid rows
+    df = df[df['HourSpendOnApp'] != 0]
 
-    return preprocessor
+    df = df.dropna()
+
+    return df

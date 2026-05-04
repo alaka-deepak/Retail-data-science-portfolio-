@@ -1,17 +1,36 @@
 from fastapi import FastAPI
-import joblib
-import pandas as pd
+from src.predict import predict
+from pydantic import BaseModel
+
+class Customer(BaseModel):
+    Tenure:float
+    CityTier:float
+    WarehouseToHome:float
+    PreferredLoginDevice:float
+    PreferredPaymentMode:float
+    Gender:int
+    HourSpendOnApp:float
+    NumberOfDeviceRegistered:float
+    PreferedOrderCat:float
+    SatisfactionScore:float
+    MaritalStatus:float
+    NumberOfAddress:float
+    Complain:float
+    OrderAmountHikeFromlastYear:float
+    CouponUsed:float
+    OrderCount:float
+    DaySinceLastOrder:float
+    CashbackAmount:float
+
+
 
 app = FastAPI()
 
-model = joblib.load("models/xgb_model.pkl")
-
 @app.get("/")
 def home():
-    return {"message": "Churn API is running"}
+    return {"message": "Churn API running"}
 
 @app.post("/predict")
-def predict(data: dict):
-    df = pd.DataFrame([data])
-    pred = model.predict(df)
-    return {"churn": int(pred[0])}
+def predict_api(data: Customer):
+    result=predict(data.model_dump())
+    return result
