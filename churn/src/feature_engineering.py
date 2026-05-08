@@ -2,19 +2,25 @@
 from src.data_ingestion import load_data
 import pandas as pd
 
-df=load_data()
-
-# feature engineering
-# col=['MaritalStatus','PreferedOrderCat','Gender','PreferredPaymentMode','PreferredLoginDevice']
-# le=LabelEncoder()
-# for i in col:
-#     data[i]=le.fit_transform(data[i])
-# data[col_null]=data[col_null].fillna(data[col_null].median())
-# data=data[(data['HourSpendOnApp'])!=0]
 def feature_engineering(df):
-    df['AvgOrderValue'] = df['CashbackAmount'] / (df['OrderCount'] + 1)
-    df['EngagementScore'] = df['HourSpendOnApp'] * df['OrderCount']
-    df['RecencyScore'] = 1 / (df['DaySinceLastOrder'] + 1)
+
+    # ensure required columns exist
+    required_cols = [
+        "HourSpendOnApp",
+        "OrderCount",
+        "DaySinceLastOrder",
+        "CashbackAmount"
+    ]
+
+    for col in required_cols:
+        if col not in df.columns:
+            df[col] = 0
+
+    # create features safely
+    df["EngagementScore"] = df["HourSpendOnApp"] * df["OrderCount"]
+    df["RecencyScore"] = 1 / (df["DaySinceLastOrder"] + 1)
+    df["AvgOrderValue"] = df["CashbackAmount"] / (df["OrderCount"] + 1)
+
     return df
     # # Create new features
     # df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")

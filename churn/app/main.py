@@ -4,9 +4,9 @@ from pydantic import BaseModel
 
 class Customer(BaseModel):
     Tenure:float
+    PreferredLoginDevice:float
     CityTier:float
     WarehouseToHome:float
-    PreferredLoginDevice:float
     PreferredPaymentMode:float
     Gender:int
     HourSpendOnApp:float

@@ -42,4 +42,6 @@ def preprocess_data(df):
 
     df = df.dropna()
 
-    return df
+    # return df
+
+print(preprocess_data(df))
